@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LiveSub</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        #transcription {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            height: 200px;
+            overflow-y: auto;
+            background: #f9f9f9;
+        }
+        #controls {
+            text-align: center;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>LiveSub - Real-Time Subtitles</h1>
+    <div id="controls">
+        <button id="start-button">Start Transcription</button>
+        <button id="clear-button">Clear</button>
+    </div>
+    <div id="transcription">Transcription will appear here...</div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.3/socket.io.js"></script>
+    <script>
+        var socket = io();
+
+        document.getElementById('start-button').addEventListener('click', function() {
+            socket.emit('start_transcription');
+        });
+
+        document.getElementById('clear-button').addEventListener('click', function() {
+            document.getElementById('transcription').innerText = 'Transcription will appear here...';
+        });
+
+        socket.on('transcription', function(data) {
+            var transcriptionElement = document.getElementById('transcription');
+            if (transcriptionElement.innerText === 'Transcription will appear here...') {
+                transcriptionElement.innerText = '';
+            }
+            transcriptionElement.innerText += data.text + '\n';
+        });
+
+        socket.on('status', function(data) {
+            console.log(data.message);
+        });
+    </script>
+</body>
+</html>
